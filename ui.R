@@ -39,7 +39,43 @@ shinyUI(fluidPage(
              
              
              tabPanel("Data Exploration",
-                      
+                      sidebarPanel(
+                          h3("This page provides a data exploration tool"),br(),
+                          
+                          "Subset Data:",
+                          selectizeInput("year", "Year", choices = c("<10"="LT10",
+                                                                     ">=10"="GE10")),
+                          
+                          h3("Data Exploration Plot"),
+                          radioButtons(inputId = "PlotType",label = "Select the Plot Type",
+                                       choices = c("Scatter Plot (X vs Y)"="SP",
+                                                   "Histogram (Y)"="Hist",
+                                                   "By Group Bar Chart (Average of Y by group)"="BC")),
+                          
+                          conditionalPanel(condition = "input.PlotType=='SP'",
+                                           selectInput('xsp', 'X', names(dataset)),
+                                           selectInput('ysp', 'Y', names(dataset), names(dataset)[[19]])),
+                          
+                          conditionalPanel(condition = "input.PlotType=='Hist'",
+                                           selectInput('yhist', 'Y', names(dataset), names(dataset)[[19]])),
+                          
+                          conditionalPanel(condition = "input.PlotType=='BC'",
+                                           selectInput('ybc', 'Y', names(dataset), names(dataset)[[19]]),
+                                           selectInput('groupbc', 'Variable to Group by', 
+                                                       c(names(dataset)[[14]],names(dataset)[[15]],names(dataset)[[20]]), names(dataset)[[14]])),
+                          
+                          h3("Data Exploration Table"),
+                          radioButtons(inputId = "SummaryType",label = "Select the Summary Type",
+                                       choices = c("Descriptive Statistics"="DS",
+                                                   "Extreme Observations"="EO")),
+                          
+                          selectInput('ysummary', 'Y', names(dataset), names(dataset)[[19]]),
+
+                        ),
+                      mainPanel(
+                        plotOutput("plot"),
+                        tableOutput("table")
+                        )
                       ),
             
              
