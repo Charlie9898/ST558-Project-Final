@@ -79,7 +79,78 @@ shinyUI(fluidPage(
                       ),
             
              
-             tabPanel("Modeling"),
+             tabPanel("Modeling",
+                      h3("This page provides three supervised learning models"),br(),
+                      navbarPage("",
+                                 tabPanel("Modeling Info",
+                                          h4("Model 1: Multiple Linear Regression"),
+                                          "Linear regression is a simple supervised learning tool for modeling a 
+                               quantitative response. It is much simpler compared to other modern 
+                               techniques; however, such models are still very useful in developing 
+                               new methods. In fact, many flexible nonparametric models can be 
+                               though of generalizations of linear regression model. Practically, in 
+                               real data, often we see relationships that locally linear. ",br(),
+                                          "A linear regression model has the form",
+                                          withMathJax(helpText('$$Y_i=\\beta_0+X_{i1}\\beta_1+X_{i2}\\beta_2+
+                                                    ...+X_{ip}\\beta_p+\\epsilon_i$$')),
+                                          withMathJax(('where \\(Y_i\\) is a quantitative response, 
+                                        \\(X_{i1},...,X_{ip}\\) are predictor variables, 
+                                        and \\(\\epsilon_i\\) is unobserved random error.')),
+                                          "The benefit of linear regression is that it performs 
+                               exceptionally well for linearly separable data; it is 
+                               easier to implement, interpret and efficient to train. 
+                               The drawback of it are that it requires linearity assumption
+                               between dependent and independent variables; it is also 
+                               quite prone to noise and overfitting.",br(),
+                                          
+                                          h4("Model 2: Regression Tree Model"),
+                                          "A regression tree is built through a process known as binary recursive 
+                               partitioning, which is an iterative process that splits the data into 
+                               partitions or branches, and then continues splitting each partition into 
+                               smaller groups as the method moves up each branch.",br(),
+                                          withMathJax(('Suppose first that we have partitioned the data 
+                                                    into M regions \\(R_1,R_2,...,R_M\\). Therefore, 
+                                                    for this configuration of regions, we have the 
+                                                    residual sum of squares RSS')),
+                                          "In tree-based methods, we construct the regions dynamically from 
+                               the data. Thus one might try to regions \\(R_1,...,R_M\\) that minimize the RSS.",
+                                          "Compared to other algorithms decision trees requires less effort for data 
+                               preparation during pre-processing. A decision tree does not require normal
+                               ization of data. However, a small change in the data can cause a large 
+                               change in the structure of the decision tree causing instability. Decision 
+                               tree also often involves higher time to train the model.",br(),
+                                          
+                                          h4("Model 3: Random Forest Model"),
+                                          "Random forests provide an improvement over bagging by decorrelating the 
+                               trees. Consider the situation where there is one very strong predictor in 
+                               the data set, along with a number of other moderately strong predictors. 
+                               Then most or all of the trees in the collection of bagged trees will use 
+                               the strong predictor in the top split. Thus, all of the bagged trees will 
+                               look quite similar to each other, and the predictions from the bagged 
+                               trees will be highly correlated. ", br(),
+                                          "Random forests overcome this problem by forcing each split to consider 
+                               only a subset of the predictors. As in bagging, we build a number of 
+                               decision trees on bootstrapped training samples. But when building these 
+                               decision trees, each time a split in a tree is considered, a random 
+                               sample of m predictors is chosen as split candidates from the full set of 
+                               p predictors.",br(),
+                                          "Random Forest is based on the bagging algorithm and uses Ensemble Learning 
+                               technique. It creates as many trees on the subset of the data and combines 
+                               the output of all the trees. In this way it reduces overfitting problem in 
+                               decision trees and also reduces the variance and therefore improves the 
+                               accuracy. Random Forest works well with both categorical and continuous 
+                               variables. It also can automatically handle missing values. However, 
+                               Random Forest creates a lot of trees (unlike only one tree in case of 
+                               decision tree) and combines their outputs. To do so, this algorithm 
+                               requires much more computational power and resources. It also requires 
+                               much more time to train as compared to decision trees as it generates 
+                               a lot of trees."
+                                 ),
+                                 tabPanel("Model Fitting",
+                                          
+                                 )
+                      ),
+             ),
              
              
              tabPanel("Data")
