@@ -1,6 +1,8 @@
 library(shiny)
 library(ISLR2)
 library(ggplot2)
+library(rpart)
+
 dataset = na.omit(Hitters)
 dataset$Salary = log(na.omit(Hitters$Salary))
 
@@ -73,8 +75,8 @@ shinyUI(fluidPage(
 
                         ),
                       mainPanel(
-                        plotOutput("plot"),
-                        tableOutput("table")
+                        plotOutput("EDAplot"),
+                        tableOutput("EDAtable")
                         )
                       ),
             
@@ -147,8 +149,101 @@ shinyUI(fluidPage(
                                a lot of trees."
                                  ),
                                  tabPanel("Model Fitting",
-                                          
-                                 )
+                                          sidebarLayout(
+                                            sidebarPanel(
+                                              sliderInput("DataSplit","Portion for Test Set",0.01,0.99,0.2,step=0.01),
+                                              br(),
+                                              tags$div(align = 'left', 
+                                                       class = 'multicol', 
+                                                       checkboxGroupInput("predictor","Select Predictors", 
+                                                                          choices = names(dataset)[-19],
+                                                                          selected = names(dataset)[1:4],inline   = T)
+                                                       ),
+                                              br(),
+                                              h4("Tuning parameters for CART model"),
+                                              sliderInput("xval","CV folds",2,10,5,step=1),
+                                              sliderInput("cp","Complexity Parameter",0,1,0,step=0.05),
+                                              br(),
+                                              h4("Tuning parameters for Random Forest model"),
+                                              sliderInput("CV","CV folds",2,10,5,step=1),
+                                              sliderInput("mtry","No. of random predictors",1,19,4,step=1),
+                                              
+                                              actionButton("FitModel",strong("Fit Models"))
+                                            ),
+                                            mainPanel(
+                                              h4("Fitting Results for Training Set"),
+                                              h5("Training RMSE"),
+                                              tableOutput("TrainRMSE"),
+                                              br(),
+                                              h5("Multiple Linear Regression Model"),
+                                              verbatimTextOutput("LMTrain"),
+                                              br(),
+                                              h5("CART Model"),
+                                              plotOutput("CARTTrain"),
+                                              br(),
+                                              h5("Random Forest Model"),
+                                              plotOutput("RFTrain"),
+                                              br(),
+                                              h4("Fitting Results for Test Set"),
+                                              "Test RMSE",
+                                              tableOutput("TestRMSE")
+                                            ))),
+                                 tabPanel("Prediction",
+                                          sidebarLayout(
+                                            sidebarPanel(
+                                              selectInput("PredMod","Select Prediction Model",
+                                                          c("Linear Model" = "mod_lm",
+                                                            "CART Model" = "mod_CART",
+                                                            "Random Forest Model" = "mod_RF")),
+                                              br(),
+                                              h4("Input the values for the predictors"),
+                                              conditionalPanel("input.predictor.includes('AtBat')",
+                                                               numericInput("AtBat","AtBat",NA)),
+                                              conditionalPanel("input.predictor.includes('Hits')",
+                                                               numericInput("Hits","Hits",NA)),
+                                              conditionalPanel("input.predictor.includes('HmRun')",
+                                                               numericInput("HmRun","HmRun",NA)),
+                                              conditionalPanel("input.predictor.includes('Runs')",
+                                                               numericInput("Runs","Runs",NA)),
+                                              conditionalPanel("input.predictor.includes('RBI')",
+                                                               numericInput("RBI","RBI",NA)),
+                                              conditionalPanel("input.predictor.includes('Walks')",
+                                                               numericInput("Walks","Walks",NA)),
+                                              conditionalPanel("input.predictor.includes('Years')",
+                                                               numericInput("Years","Years",NA)),
+                                              conditionalPanel("input.predictor.includes('AtBat')",
+                                                               numericInput("CAtBat","CAtBat",NA)),
+                                              conditionalPanel("input.predictor.includes('CAtBat')",
+                                                               numericInput("CHits","CHits",NA)),
+                                              conditionalPanel("input.predictor.includes('CHmRun')",
+                                                               numericInput("CHmRun","CHmRun",NA)),
+                                              conditionalPanel("input.predictor.includes('CRuns')",
+                                                               numericInput("CRuns","CRuns",NA)),
+                                              conditionalPanel("input.predictor.includes('CRBI')",
+                                                               numericInput("CRBI","CRBI",NA)),
+                                              conditionalPanel("input.predictor.includes('CWalks')",
+                                                               numericInput("CWalks","CWalks",NA)),
+                                              conditionalPanel("input.predictor.includes('League')",
+                                                               textInput("League","League (A or N)",NA)),
+                                              conditionalPanel("input.predictor.includes('Division')",
+                                                               textInput("Division","Division (E or W)",NA)),
+                                              conditionalPanel("input.predictor.includes('PutOuts')",
+                                                               numericInput("PutOuts","PutOuts",NA)),
+                                              conditionalPanel("input.predictor.includes('Assists')",
+                                                               numericInput("Assists","Assists",NA)),
+                                              conditionalPanel("input.predictor.includes('Errors')",
+                                                               numericInput("Errors","Errors",NA)),
+                                              conditionalPanel("input.predictor.includes('NewLeague')",
+                                                               textInput("NewLeague","NewLeague (A or N)",NA)),
+                                              
+                                              actionButton("PredBut",strong("Predict"))
+                                            ),
+                                            mainPanel(
+                                              h4("Prediction Result:"),
+                                              "Salary:",
+                                              verbatimTextOutput("prediction")
+                                            )),
+                                          )
                       ),
              ),
              
