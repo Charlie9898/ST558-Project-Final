@@ -29,7 +29,7 @@ shinyUI(fluidPage(
                       a("here",href="https://www.rdocumentation.org/packages/ISLR2/versions/1.3-2/topics/Hitters"),".",
                       
                       h2("Pages"),"This app contains four pages, each page contain
-                      several tabs.",br(), "The first",code("About"),"page provies an overview 
+                      several tabs.",br(), "The first",code("About"),"page provides an overview 
                       about the purpose of the app, the data used in the app, and
                       other related information. ",br(), "The second",code("Data Exploration"),
                       "page provides tools to explore the input data. Summary 
@@ -53,8 +53,8 @@ shinyUI(fluidPage(
                           "Subset Data:",
                           # For illustration purpose, subset rows based on Year interval
                           # Can also add additional rules for row subset
-                          selectizeInput("year", "Year", choices = c("<10"="LT10",
-                                                                     ">=10"="GE10")),
+                          selectizeInput("year", "Year (Number of years in the major leagues)", 
+                                         choices = c("<10"="LT10", ">=10"="GE10", "All"="all")),
                           
                           h3("Data Exploration Plot"),
                           # select types of outputs for EDA
@@ -130,9 +130,9 @@ shinyUI(fluidPage(
                                           "In tree-based methods, we construct the regions dynamically from 
                                            the data. Thus one might try to regions \\(R_1,...,R_M\\) that minimize the RSS.",
                                           "Compared to other algorithms decision trees requires less effort for data 
-                                           preparation during pre-processing. A decision tree does not require normal
-                                           ization of data. However, a small change in the data can cause a large 
-                                           change in the structure of the decision tree causing instability. Decision 
+                                           preparation during pre-processing. A decision tree does not require normalization
+                                           of data. However, a small change in the data can cause a large change in
+                                           the structure of the decision tree causing instability. Decision 
                                            tree also often involves higher time to train the model.",br(),
                                           
                                           h4("Model 3: Random Forest Model"),
@@ -196,13 +196,13 @@ shinyUI(fluidPage(
                                               h5("Training RMSE"),
                                               tableOutput("TrainRMSE"),
                                               br(),
-                                              h5("Multiple Linear Regression Model"),
+                                              h5("Multiple Linear Regression Model Summary"),
                                               verbatimTextOutput("LMTrain"),
                                               br(),
-                                              h5("CART Model"),
+                                              h5("CART Model Variable Importance"),
                                               plotOutput("CARTTrain"),
                                               br(),
-                                              h5("Random Forest Model"),
+                                              h5("Random Forest Model Variable Importance"),
                                               plotOutput("RFTrain"),
                                               br(),
                                               h4("Fitting Results for Test Set"),
@@ -212,6 +212,7 @@ shinyUI(fluidPage(
                                  tabPanel("Prediction",
                                           sidebarLayout(
                                             sidebarPanel(
+                                              h4("Please fit the model first!"),br(),
                                               # choose the model for prediction
                                               selectInput("PredMod","Select Prediction Model",
                                                           c("Linear Model" = "mod_lm",

@@ -19,7 +19,8 @@ shinyServer(function(input, output, session) {
   # Subset the data for EDA
   getData <- reactive({
     if(input$year=="LT10") {newData <- dataset %>% dplyr::filter(Years <10)} 
-    else {newData <- dataset %>% dplyr::filter(Years >=10)}
+    else if (input$year=="GE10") {newData <- dataset %>% dplyr::filter(Years >=10)}
+    else {newData <- dataset}
     })
   
   # EDA plots
@@ -59,6 +60,8 @@ shinyServer(function(input, output, session) {
   v = reactiveValues(data = NULL)
   
   observeEvent(input$FitModel,{
+    withProgress(message = 'Fitting Model', value = 0, {
+    
     set.seed(123)
     split = initial_split(dataset,(1-input$DataSplit))
     v$dat_train = training(split)
@@ -71,11 +74,15 @@ shinyServer(function(input, output, session) {
     ## Fit the models
     mod_lm = lm(paste0("Salary~",pred),data = v$dat_train)
     
+    incProgress(1/3, detail = paste("Linear Model", 1))
+    
     set.seed(123)
     grid = expand.grid(cp = input$cp)
     trctrl = trainControl(method = "cv", number = input$xval)
     mod_CART = train(as.formula(paste0("Salary~",pred)), data = v$dat_train, 
                      method = "rpart", trControl=trctrl,tuneGrid = grid)
+    
+    incProgress(1/3, detail = paste("CART", 2))
     
     set.seed(123)
     grid = expand.grid(mtry = input$mtry)
@@ -83,10 +90,13 @@ shinyServer(function(input, output, session) {
     mod_RF = train(as.formula(paste0("Salary~",pred)), data = v$dat_train,
                    method = "rf",trControl=trctrl,tuneGrid = grid)
     
+    incProgress(1/3, detail = paste("Random Forest", 3))
+    
     output$TrainRMSE = renderTable({
-      round(data.frame(LinearModel = sqrt(mean(mod_lm$residuals^2)),
-                 CART = RMSE(predict(mod_CART,newdata = v$dat_train),v$dat_train$Salary),
-                 RandomForest = RMSE(predict(mod_RF,newdata = v$dat_train),v$dat_train$Salary)),3)
+      TrainResult = data.frame(LinearModel = sqrt(mean(mod_lm$residuals^2)),
+                               CART = RMSE(predict(mod_CART,newdata = v$dat_train),v$dat_train$Salary),
+                               RandomForest = RMSE(predict(mod_RF,newdata = v$dat_train),v$dat_train$Salary))
+      round(TrainResult,3)
     })
     
     ## Render output summaries
@@ -105,10 +115,13 @@ shinyServer(function(input, output, session) {
                        CART = RMSE(pred_CART,v$dat_test$Salary),
                        RandomForest = RMSE(pred_rf,v$dat_test$Salary)),3)
     })
+    })
   })
   
     # Prediction model
   observeEvent(input$PredBut,{
+    withProgress(message = 'Predicting', value = 0, {
+    
     ## Initial the model formula
     pred=c()
     for (i in 1:length(input$predictor)) {pred = paste0(pred,"+",input$predictor[i])}
@@ -129,6 +142,7 @@ shinyServer(function(input, output, session) {
       mod_pred = train(as.formula(paste0("Salary~",pred)), data = v$dat_train,
                      method = "rf",trControl=trctrl,tuneGrid = grid)
     }
+    incProgress(1/1, detail = paste("Obtaining Prediction", 1))
     
     ## Predict the value
     dat_new = data.frame(AtBat = input$AtBat, Hits = input$Hits, HmRun = input$HmRun, Runs = input$Runs,
@@ -139,6 +153,8 @@ shinyServer(function(input, output, session) {
                          NewLeague = input$NewLeague)
     
     output$prediction = renderPrint({predict(mod_pred,newdata = dat_new)})
+    
+  })
   })
   
   # Subset dataset for Data panel
