@@ -5,9 +5,10 @@ library(rpart)
 library(shinyFiles)
 library(xlsx)
 # Preprocessing the dataset, omit the NA values and log-transform the Salary variable for normality
-data(Hitters)
+
+data("Hitters")
 dataset = na.omit(Hitters)
-dataset$Salary = log(na.omit(Hitters$Salary))
+dataset$Salary = log(dataset$Salary)
 
 shinyUI(fluidPage(
   

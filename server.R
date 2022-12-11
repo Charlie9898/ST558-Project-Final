@@ -5,13 +5,21 @@ library(stringr)
 library(rstatix)
 library(rsample)
 library(caret)
+library(ISLR2)
 library(Metrics)
+library(shinyFiles)
+library(xlsx)
+library(rpart)
+
+data("Hitters")
+dataset = na.omit(Hitters)
+dataset$Salary = log(dataset$Salary)
 
 shinyServer(function(input, output, session) {
   # Subset the data for EDA
   getData <- reactive({
-    if(input$year=="LT10") {newData <- dataset %>% filter(Years <10)} 
-    else {newData <- dataset %>% filter(Years >=10)}
+    if(input$year=="LT10") {newData <- dataset %>% dplyr::filter(Years <10)} 
+    else {newData <- dataset %>% dplyr::filter(Years >=10)}
     })
   
   # EDA plots
@@ -135,12 +143,12 @@ shinyServer(function(input, output, session) {
   
   # Subset dataset for Data panel
   SubsetData <- reactive({
-    if(input$SubsetRows=="5-") {newData <- dataset %>% filter(Salary <5)} 
+    if(input$SubsetRows=="5-") {newData <- dataset %>% dplyr::filter(Salary <5)} 
     else if (input$SubsetRows=="5-6")
-    {newData <- dataset %>% filter(Salary >=5 & Salary <6)}
+    {newData <- dataset %>% dplyr::filter(Salary >=5 & Salary <6)}
     else if (input$SubsetRows=="6-7")
-    {newData <- dataset %>% filter(Salary >=6 & Salary <7)}
-    else {newData <- dataset %>% filter(Salary >7)}
+    {newData <- dataset %>% dplyr::filter(Salary >=6 & Salary <7)}
+    else {newData <- dataset %>% dplyr::filter(Salary >7)}
     
     newData = select(newData,input$SubsetColumns)
   })
