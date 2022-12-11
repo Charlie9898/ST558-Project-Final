@@ -25,5 +25,5 @@ install.packages(c("shiny","ISLR2","ggplot2","rpart","shinyFiles","xlsx","dplyr"
 ## Run the App
 Use the following code to run the APP.
 ```{r}
-runGitHub("ST558-Project-Final","Charlie9898")
+shiny::runGitHub("ST558-Project-Final","Charlie9898")
 ```
