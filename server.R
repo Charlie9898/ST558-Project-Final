@@ -133,4 +133,30 @@ shinyServer(function(input, output, session) {
     output$prediction = renderPrint({predict(mod_pred,newdata = dat_new)})
   })
   
+  # Subset dataset for Data panel
+  SubsetData <- reactive({
+    if(input$SubsetRows=="5-") {newData <- dataset %>% filter(Salary <5)} 
+    else if (input$SubsetRows=="5-6")
+    {newData <- dataset %>% filter(Salary >=5 & Salary <6)}
+    else if (input$SubsetRows=="6-7")
+    {newData <- dataset %>% filter(Salary >=6 & Salary <7)}
+    else {newData <- dataset %>% filter(Salary >7)}
+    
+    newData = select(newData,input$SubsetColumns)
+  })
+  # Render subset data
+  output$DataOutput = renderDataTable({
+    subDat = SubsetData()
+    })
+  
+  # save the file
+  observe({
+    volumes <- c("UserFolder"="D:/")
+    shinyFileSave(input, "save", roots=volumes, session=session)
+    fileinfo <- parseSavePath(volumes, input$save)
+    data <- SubsetData()
+    if (nrow(fileinfo) > 0) {
+      write.xlsx(data, as.character(fileinfo$datapath))
+    }
+  })
 })
